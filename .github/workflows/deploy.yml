@@ -42,8 +42,10 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: 22
-          # On envoie le contenu de 'dist' vers le dossier du serveur
+          # On prend tout ce qu'il y a dans le dossier dist généré par GitHub
           source: "dist/*"
-          target: "/var/www/financiary/frontend"
-          # strip_components: 1 permet d'éviter de créer un dossier 'dist' dans 'dist'
+          # ET ON LE MET DANS LE DOSSIER DIST DU SERVEUR (C'est ça qui manquait)
+          target: "/var/www/financiary/frontend/dist"
+          # strip_components: 1 enlève le dossier parent "dist" de la source
+          # pour ne copier que les fichiers à l'intérieur vers la target
           strip_components: 1

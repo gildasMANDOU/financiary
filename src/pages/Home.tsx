@@ -10,7 +10,7 @@ export function Home() {
       <div className="mb-6">
         <h2 className="text-2xl font-semibold mb-2">Tableau de bord</h2>
         <p className="text-sm text-muted-foreground">
-          Ajoutez une transaction et consultez votre soldes
+          Ajoutez une transaction et consultez votre 
         </p>
       </div>
 
