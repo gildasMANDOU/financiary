@@ -1,0 +1,49 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main  # La pipeline se lance quand on push sur 'main'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Récupérer le code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Installer Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # 3. Installer les dépendances
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. Créer le .env de production à la volée
+      # (GitHub injecte la variable secrète ici)
+      - name: Create .env file
+        run: |
+          echo "VITE_POCKETBASE_URL=${{ secrets.VITE_POCKETBASE_URL }}" > .env.production
+
+      # 5. Construire le projet (Build)
+      - name: Build project
+        run: npm run build
+
+      # 6. Envoyer les fichiers sur le VPS (SCP)
+      - name: Deploy to VPS via SCP
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+      rname: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 22
+          # On envoie le contenu de 'dist' vers le dossier du serveur
+          source: "dist/*"
+          target: "/var/www/financiary/frontend"
+          # strip_components: 1 permet d'éviter de créer un dossier 'dist' dans 'dist'
+          strip_components: 1
