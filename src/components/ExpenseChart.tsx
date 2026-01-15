@@ -63,7 +63,7 @@ export function ExpenseChart() {
 
   if (expenseData.length === 0) {
     return (
-      <Card className="border-border/50 shadow-sm">
+      <Card className="border-border/50 shadow-sm transition-all duration-200 hover:shadow-md">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2 text-lg font-semibold">
             <TrendingDown className="h-5 w-5 text-expense" />
@@ -91,7 +91,7 @@ export function ExpenseChart() {
   }
 
   return (
-    <Card className="border-border/50 shadow-sm">
+    <Card className="border-border/50 shadow-sm transition-all duration-200 hover:shadow-md">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-lg font-semibold">
           <TrendingDown className="h-5 w-5 text-expense" />

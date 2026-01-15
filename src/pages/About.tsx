@@ -11,7 +11,7 @@ export function About() {
   const navigate = useNavigate();
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6 sm:space-y-8">
+    <div className="mx-auto max-w-3xl space-y-6 sm:space-y-8 animate-in fade-in-0 slide-in-from-bottom-4 duration-500">
       <div className="mb-6">
         <h2 className="text-2xl font-semibold mb-2">À propos de Financiary</h2>
         <p className="text-sm text-muted-foreground">
@@ -20,7 +20,7 @@ export function About() {
       </div>
 
       {/* Section principale */}
-      <Card className="border-border/50 shadow-sm">
+      <Card className="border-border/50 shadow-sm animate-in fade-in-0 slide-in-from-bottom-4 duration-500 delay-200">
         <CardHeader>
           <CardTitle className="text-xl font-semibold">Qu'est-ce que Financiary ?</CardTitle>
         </CardHeader>
@@ -38,7 +38,7 @@ export function About() {
       </Card>
 
       {/* Fonctionnalités */}
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 delay-300">
         <Card className="border-border/50 shadow-sm">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-3 mb-2">
@@ -109,7 +109,7 @@ export function About() {
       </div>
 
       {/* Section utilisation */}
-      <Card className="border-border/50 shadow-sm">
+      <Card className="border-border/50 shadow-sm animate-in fade-in-0 slide-in-from-bottom-4 duration-500 delay-400">
         <CardHeader>
           <CardTitle className="text-xl font-semibold">Comment utiliser Financiary ?</CardTitle>
         </CardHeader>
@@ -139,7 +139,7 @@ export function About() {
       </Card>
 
       {/* CTA principal */}
-      <Card className="border-border/50 shadow-sm bg-gradient-to-br from-primary/5 to-background">
+      <Card className="border-border/50 shadow-sm bg-gradient-to-br from-primary/5 to-background animate-in fade-in-0 slide-in-from-bottom-4 duration-500 delay-500">
         <CardContent className="pt-6">
           <div className="text-center space-y-4">
             <h3 className="text-xl font-semibold">Prêt à commencer ?</h3>

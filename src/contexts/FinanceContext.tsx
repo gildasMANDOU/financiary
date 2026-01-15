@@ -21,6 +21,7 @@ interface PocketBaseRecord {
   category?: string;
   type: 'expense' | 'income';
   date: string;
+  userId?: string; // Cycle 3 : ID de l'utilisateur propriétaire
 }
 
 // Mapper un enregistrement PocketBase vers Transaction
@@ -72,9 +73,18 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
       setError(null);
       
-      // Récupérer toutes les transactions depuis PocketBase
+      // Vérifier l'authentification (Cycle 3)
+      if (!pb.authStore.isValid || !pb.authStore.model) {
+        setTransactions([]);
+        setIsLoading(false);
+        return;
+      }
+      
+      // Récupérer les transactions de l'utilisateur connecté
+      // Les API Rules PocketBase filtrent automatiquement par userId
       const records = await pb.collection('transactions').getFullList<PocketBaseRecord>({
         sort: '-created', // Plus récentes en premier
+        // Le filtrage par userId est géré automatiquement par les API Rules
       });
       
       // Mapper les enregistrements PocketBase vers le format Transaction
@@ -84,6 +94,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors du chargement des données';
       setError(errorMessage);
       console.error('Erreur lors du chargement depuis PocketBase:', err);
+      setTransactions([]); // En cas d'erreur, vider la liste
     } finally {
       setIsLoading(false);
     }
@@ -104,18 +115,27 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     try {
       setError(null);
       
+      // Vérifier l'authentification (Cycle 3)
+      if (!pb.authStore.isValid || !pb.authStore.model) {
+        throw new Error('Vous devez être connecté pour ajouter une transaction');
+      }
+      
       // Validation : description obligatoire
       if (!input.description || !input.description.trim()) {
         throw new Error('La description est obligatoire');
       }
       
-      // Créer la transaction dans PocketBase
+      // Obtenir l'ID de l'utilisateur connecté
+      const userId = pb.authStore.model.id;
+      
+      // Créer la transaction dans PocketBase avec userId
       await pb.collection('transactions').create<PocketBaseRecord>({
         type: input.type,
         amount: input.amount,
         description: input.description.trim(),
         category: input.category || '',
         date: input.date,
+        userId: userId, // Cycle 3 : Lier la transaction à l'utilisateur
       });
       
       // Recharger toutes les transactions depuis le serveur pour garantir la cohérence

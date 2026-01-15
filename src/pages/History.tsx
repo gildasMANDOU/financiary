@@ -22,8 +22,8 @@ export function History() {
   };
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6 sm:space-y-8">
-      <div className="mb-6">
+    <div className="mx-auto max-w-4xl space-y-6 sm:space-y-8 animate-in fade-in-0 slide-in-from-bottom-4 duration-500">
+      <div className="mb-6 animate-in fade-in-0 slide-in-from-left-4 duration-500 delay-100">
         <h2 className="text-2xl font-semibold mb-2">Historique financier</h2>
         <p className="text-sm text-muted-foreground">
           Consultez votre solde, toutes vos transactions et vos statistiques
@@ -31,7 +31,7 @@ export function History() {
       </div>
 
       {/* Section Solde et Totaux */}
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 delay-200">
         {/* Solde Actuel */}
         <Card className={`sm:col-span-2 border-border/50 shadow-sm overflow-hidden ${
           balance >= 0 
@@ -85,10 +85,14 @@ export function History() {
       </div>
 
       {/* Liste complète des transactions */}
-      <TransactionList />
+      <div className="animate-in fade-in-0 slide-in-from-bottom-4 duration-500 delay-300">
+        <TransactionList />
+      </div>
 
       {/* Graphique des dépenses par catégorie */}
-      <ExpenseChart />
+      <div className="animate-in fade-in-0 slide-in-from-bottom-4 duration-500 delay-400">
+        <ExpenseChart />
+      </div>
     </div>
   );
 }
