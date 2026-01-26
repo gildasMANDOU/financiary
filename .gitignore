@@ -31,3 +31,6 @@ CURRENT_STATE.md
 pocketbase/
 .env
 pb_data/
+
+resources/
+.github/
