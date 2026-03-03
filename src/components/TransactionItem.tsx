@@ -49,7 +49,11 @@ export function TransactionItem({ transaction, confirm, alert }: TransactionItem
   };
 
   return (
-    <div className="group flex items-center gap-3 rounded-xl border border-border/50 bg-card p-4 transition-all duration-200 hover:border-border hover:shadow-md hover:scale-[1.02]">
+    <div className={`group flex items-center gap-3 rounded-xl border border-border/50 bg-card p-4 transition-all duration-200 hover:shadow-md hover:scale-[1.02] ${
+      isIncome 
+        ? 'hover:border-income/30 hover:bg-income-light/10' 
+        : 'hover:border-expense/30 hover:bg-expense-light/10'
+    }`}>
       {/* Icône */}
       <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
         isIncome 

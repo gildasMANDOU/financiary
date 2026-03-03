@@ -63,11 +63,11 @@ export default {
         },
         // Couleurs personnalisées pour les finances
         income: {
-          DEFAULT: "#10b981", // vert
-          light: "#d1fae5",
+          DEFAULT: "#59D4A8", // Vert du logo
+          light: "#E7F9F3",
         },
         expense: {
-          DEFAULT: "#ef4444", // rouge
+          DEFAULT: "#ef4444", // Rouge standard (gardé pour les dépenses)
           light: "#fee2e2",
         },
       },

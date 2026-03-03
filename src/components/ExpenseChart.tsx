@@ -6,24 +6,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { TrendingDown, Plus } from 'lucide-react';
 
-// Couleurs pour chaque catégorie (palette moderne)
+// Couleurs pour chaque catégorie (palette moderne basée sur le logo)
 const CATEGORY_COLORS = [
-  '#ef4444', // Rouge principal
-  '#f97316', // Orange
-  '#eab308', // Jaune
-  '#22c55e', // Vert
+  '#ef4444', // Rouge (pour les dépenses)
+  '#213261', // Bleu Financiary
+  '#59D4A8', // Vert Financiary
   '#3b82f6', // Bleu
   '#8b5cf6', // Violet
+  '#f97316', // Orange
   '#ec4899', // Rose
 ];
 
 export function ExpenseChart() {
   const navigate = useNavigate();
-  const { transactions } = useFinanceStore();
+  const { filteredTransactions } = useFinanceStore();
 
   // Calculer les dépenses par catégorie
   const expenseData = useMemo(() => {
-    const expenses = transactions.filter(t => t.type === 'expense');
+    const expenses = filteredTransactions.filter(t => t.type === 'expense');
     
     // Grouper par catégorie
     const categoryMap = new Map<string, number>();
@@ -44,13 +44,15 @@ export function ExpenseChart() {
       .sort((a, b) => b.value - a.value);
 
     return data;
-  }, [transactions]);
+  }, [filteredTransactions]);
 
   // Formater les montants pour le tooltip
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
       currency: 'XOF',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(value);
   };
 
@@ -63,23 +65,24 @@ export function ExpenseChart() {
 
   if (expenseData.length === 0) {
     return (
-      <Card className="border-border/50 shadow-sm transition-all duration-200 hover:shadow-md">
+      <Card className="border-border/50 shadow-sm transition-all duration-200 hover:shadow-md bg-card/50 backdrop-blur-sm">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2 text-lg font-semibold">
             <TrendingDown className="h-5 w-5 text-expense" />
             Dépenses par catégorie
           </CardTitle>
           <CardDescription className="text-sm">
-            Répartition de vos dépenses
+            Répartition de vos dépenses pour cette période
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center h-64 space-y-4 text-muted-foreground">
-            <p className="text-sm">Aucune dépense enregistrée</p>
+            <p className="text-sm">Aucune dépense pour cette période</p>
             <Button
               onClick={() => navigate('/')}
               variant="outline"
               size="sm"
+              className="rounded-xl"
             >
               <Plus className="mr-2 h-4 w-4" />
               Ajouter une dépense
@@ -91,19 +94,19 @@ export function ExpenseChart() {
   }
 
   return (
-    <Card className="border-border/50 shadow-sm transition-all duration-200 hover:shadow-md">
+    <Card className="border-border/50 shadow-sm transition-all duration-200 hover:shadow-md bg-card/50 backdrop-blur-sm">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-lg font-semibold">
           <TrendingDown className="h-5 w-5 text-expense" />
           Dépenses par catégorie
         </CardTitle>
         <CardDescription className="text-sm">
-          Répartition de vos dépenses
+          Répartition de vos dépenses pour cette période
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="w-full">
-          <ResponsiveContainer width="100%" height={280}>
+          <ResponsiveContainer width="100%" height={320}>
             <PieChart>
               <Pie
                 data={expenseData}
@@ -131,7 +134,7 @@ export function ExpenseChart() {
               />
               <Legend
                 verticalAlign="bottom"
-                height={40}
+                height={60}
                 formatter={(value) => {
                   const item = expenseData.find(d => d.name === value);
                   return item ? `${value} (${formatCurrency(item.value)})` : value;

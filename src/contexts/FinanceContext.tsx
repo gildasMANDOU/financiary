@@ -7,6 +7,7 @@ import {
   calculateTotalExpenses,
   filterTransactionsByType,
   sortTransactionsByDate,
+  filterTransactionsByPeriod,
 } from '@/utils/calculations';
 
 // Type pour les enregistrements PocketBase
@@ -40,6 +41,11 @@ function mapPocketBaseToTransaction(record: PocketBaseRecord): Transaction {
 interface FinanceContextType {
   // Données
   transactions: Transaction[];
+  filteredTransactions: Transaction[];
+  
+  // Filtres
+  period: 'current_month' | 'last_7_days' | 'last_30_days' | 'current_year' | 'all';
+  setPeriod: (period: 'current_month' | 'last_7_days' | 'last_30_days' | 'current_year' | 'all') => void;
   
   // Calculs
   balance: number;
@@ -64,6 +70,7 @@ const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
 
 export function FinanceProvider({ children }: { children: ReactNode }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [period, setPeriod] = useState<'current_month' | 'last_7_days' | 'last_30_days' | 'current_year' | 'all'>('current_month');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -105,10 +112,15 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     reloadTransactions();
   }, [reloadTransactions]);
 
-  // Calculs mémorisés
-  const balance = useMemo(() => calculateBalance(transactions), [transactions]);
-  const totalIncome = useMemo(() => calculateTotalIncome(transactions), [transactions]);
-  const totalExpenses = useMemo(() => calculateTotalExpenses(transactions), [transactions]);
+  // Transactions filtrées par période
+  const filteredTransactions = useMemo(() => {
+    return filterTransactionsByPeriod(transactions, period);
+  }, [transactions, period]);
+
+  // Calculs mémorisés basés sur les transactions filtrées
+  const balance = useMemo(() => calculateBalance(filteredTransactions), [filteredTransactions]);
+  const totalIncome = useMemo(() => calculateTotalIncome(filteredTransactions), [filteredTransactions]);
+  const totalExpenses = useMemo(() => calculateTotalExpenses(filteredTransactions), [filteredTransactions]);
 
   // Ajouter une transaction
   const addTransaction = useCallback(async (input: TransactionInput) => {
@@ -128,23 +140,50 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       // Obtenir l'ID de l'utilisateur connecté
       const userId = pb.authStore.model.id;
       
-      // Créer la transaction dans PocketBase avec userId
-      await pb.collection('transactions').create<PocketBaseRecord>({
+      // Préparer les données pour PocketBase
+      const transactionData: any = {
         type: input.type,
         amount: input.amount,
         description: input.description.trim(),
-        category: input.category || '',
         date: input.date,
-        userId: userId, // Cycle 3 : Lier la transaction à l'utilisateur
-      });
+        userId: userId,
+      };
+      
+      if (input.category && input.category.trim()) {
+        transactionData.category = input.category.trim();
+      }
+      
+      // Créer la transaction dans PocketBase
+      try {
+        await pb.collection('transactions').create<PocketBaseRecord>(transactionData);
+      } catch (firstError: any) {
+        // Fallback si userId n'existe pas encore
+        if (firstError?.response?.status === 400 && 
+            firstError?.response?.data && 
+            Object.keys(firstError.response.data).length === 0) {
+          const { userId: _, ...dataWithoutUserId } = transactionData;
+          await pb.collection('transactions').create<PocketBaseRecord>(dataWithoutUserId);
+        } else {
+          throw firstError;
+        }
+      }
       
       // Recharger toutes les transactions depuis le serveur pour garantir la cohérence
       await reloadTransactions();
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Erreur lors de l\'ajout de la transaction';
+    } catch (err: any) {
+      let errorMessage = 'Erreur lors de l\'ajout de la transaction';
+      if (err?.response) {
+        const pbError = err.response;
+        if (pbError.status === 400 && pbError.data && Object.keys(pbError.data).length === 0) {
+          errorMessage = 'Le champ "userId" n\'existe pas dans la collection "transactions".';
+        } else if (pbError.message) {
+          errorMessage = pbError.message;
+        }
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      }
       setError(errorMessage);
-      console.error('Erreur lors de l\'ajout de la transaction:', err);
-      throw err; // Propager l'erreur pour que le composant puisse la gérer
+      throw new Error(errorMessage);
     }
   }, [reloadTransactions]);
 
@@ -177,21 +216,24 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   // Filtrer les transactions par type
   const getTransactionsByType = useCallback(
     (type: 'expense' | 'income' | 'all'): Transaction[] => {
-      return filterTransactionsByType(transactions, type);
+      return filterTransactionsByType(filteredTransactions, type);
     },
-    [transactions]
+    [filteredTransactions]
   );
 
   // Obtenir les transactions triées par date
   const getSortedTransactions = useCallback(
     (ascending: boolean = false): Transaction[] => {
-      return sortTransactionsByDate(transactions, ascending);
+      return sortTransactionsByDate(filteredTransactions, ascending);
     },
-    [transactions]
+    [filteredTransactions]
   );
 
   const value: FinanceContextType = {
     transactions,
+    filteredTransactions,
+    period,
+    setPeriod,
     balance,
     totalIncome,
     totalExpenses,

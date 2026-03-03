@@ -1,4 +1,5 @@
 import { Transaction } from '@/types/transaction';
+import { isWithinInterval, startOfMonth, endOfMonth, startOfWeek, endOfWeek, startOfYear, endOfYear, parseISO, subDays } from 'date-fns';
 
 /**
  * Calcule le solde actuel (revenus - dépenses)
@@ -25,6 +26,34 @@ export function calculateTotalExpenses(transactions: Transaction[]): number {
   return transactions
     .filter(t => t.type === 'expense')
     .reduce((sum, t) => sum + t.amount, 0);
+}
+
+/**
+ * Filtre les transactions par période
+ */
+export function filterTransactionsByPeriod(
+  transactions: Transaction[],
+  period: 'current_month' | 'last_7_days' | 'last_30_days' | 'current_year' | 'all'
+): Transaction[] {
+  const now = new Date();
+  
+  return transactions.filter(t => {
+    const date = parseISO(t.date);
+    
+    switch (period) {
+      case 'current_month':
+        return isWithinInterval(date, { start: startOfMonth(now), end: endOfMonth(now) });
+      case 'last_7_days':
+        return isWithinInterval(date, { start: subDays(now, 7), end: now });
+      case 'last_30_days':
+        return isWithinInterval(date, { start: subDays(now, 30), end: now });
+      case 'current_year':
+        return isWithinInterval(date, { start: startOfYear(now), end: endOfYear(now) });
+      case 'all':
+      default:
+        return true;
+    }
+  });
 }
 
 /**

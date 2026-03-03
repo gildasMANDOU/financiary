@@ -2,10 +2,17 @@ import { useNavigate } from 'react-router-dom';
 import { useFinanceStore } from '@/contexts/FinanceContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { TrendingUp, TrendingDown, Wallet, Plus } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, Plus, Filter } from 'lucide-react';
 import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 import { useAlert } from '@/hooks/useAlert';
 import { TransactionItem } from '@/components/TransactionItem';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
 
 export function Dashboard() {
   const navigate = useNavigate();
@@ -14,6 +21,8 @@ export function Dashboard() {
     totalIncome,
     totalExpenses,
     getSortedTransactions,
+    period,
+    setPeriod
   } = useFinanceStore();
   const { confirm, ConfirmDialog } = useConfirmDialog();
   const { alert, Alert } = useAlert();
@@ -33,10 +42,33 @@ export function Dashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Filtre de période - Style Apple */}
+      <div className="flex items-center justify-between bg-card/50 backdrop-blur-sm p-2 px-3 rounded-2xl border border-border/40 shadow-sm">
+        <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          <Filter className="h-3.5 w-3.5" />
+          <span>Période</span>
+        </div>
+        <Select 
+          value={period} 
+          onValueChange={(value: any) => setPeriod(value)}
+        >
+          <SelectTrigger className="w-[160px] h-9 border-none bg-muted/50 hover:bg-muted/80 transition-colors rounded-xl focus:ring-1 focus:ring-primary/20 text-sm font-medium">
+            <SelectValue placeholder="Choisir une période" />
+          </SelectTrigger>
+          <SelectContent className="rounded-xl border-border/40 shadow-xl">
+            <SelectItem value="current_month" className="rounded-lg">Mois actuel</SelectItem>
+            <SelectItem value="last_7_days" className="rounded-lg">7 derniers jours</SelectItem>
+            <SelectItem value="last_30_days" className="rounded-lg">30 derniers jours</SelectItem>
+            <SelectItem value="current_year" className="rounded-lg">Année en cours</SelectItem>
+            <SelectItem value="all" className="rounded-lg">Toutes les données</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       {/* Section Solde et Totaux - Mobile First */}
       <div className="grid gap-4 sm:grid-cols-2">
         {/* Solde Actuel - Style Apple épuré */}
-        <Card className={`sm:col-span-2 border-border/50 shadow-sm overflow-hidden ${
+        <Card className={`sm:col-span-2 border-border/50 shadow-sm overflow-hidden transition-all duration-500 ${
           balance >= 0 
             ? 'bg-gradient-to-br from-income-light/30 to-background border-income/20' 
             : 'bg-gradient-to-br from-expense-light/30 to-background border-expense/20'
@@ -48,7 +80,7 @@ export function Dashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className={`text-3xl sm:text-4xl font-bold tracking-tight ${
+            <div className={`text-3xl sm:text-4xl font-bold tracking-tight transition-colors duration-500 ${
               balance >= 0 ? 'text-income' : 'text-expense'
             }`}>
               {formatCurrency(balance)}
@@ -57,7 +89,7 @@ export function Dashboard() {
         </Card>
 
         {/* Total Revenus */}
-        <Card className="border-border/50 shadow-sm">
+        <Card className="border-border/50 shadow-sm bg-card/50 backdrop-blur-sm">
           <CardHeader className="pb-3">
             <CardDescription className="flex items-center gap-2 text-xs font-medium">
               <TrendingUp className="h-3.5 w-3.5 text-income" />
@@ -72,7 +104,7 @@ export function Dashboard() {
         </Card>
 
         {/* Total Dépenses */}
-        <Card className="border-border/50 shadow-sm">
+        <Card className="border-border/50 shadow-sm bg-card/50 backdrop-blur-sm">
           <CardHeader className="pb-3">
             <CardDescription className="flex items-center gap-2 text-xs font-medium">
               <TrendingDown className="h-3.5 w-3.5 text-expense" />
@@ -88,11 +120,14 @@ export function Dashboard() {
       </div>
 
       {/* Section Dernières Transactions - Style Apple */}
-      <Card className="border-border/50 shadow-sm">
+      <Card className="border-border/50 shadow-sm bg-card/50 backdrop-blur-sm">
         <CardHeader className="pb-4">
           <CardTitle className="text-lg font-semibold">Dernières transactions</CardTitle>
           <CardDescription className="text-sm">
-            Vos 5 transactions les plus récentes
+            {recentTransactions.length > 0 
+              ? `Vos ${recentTransactions.length} transactions les plus récentes`
+              : 'Aucune transaction pour cette période'
+            }
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -104,6 +139,7 @@ export function Dashboard() {
                 onClick={() => navigate('/')}
                 variant="outline"
                 size="sm"
+                className="rounded-xl"
               >
                 <Plus className="mr-2 h-4 w-4" />
                 Ajouter une transaction

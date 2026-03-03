@@ -111,7 +111,7 @@ export function TransactionForm() {
                 className={`flex items-center justify-center gap-2 rounded-xl border-2 p-4 transition-all ${
                   type === 'expense'
                     ? 'border-expense bg-expense-light/50 text-expense shadow-sm'
-                    : 'border-border bg-background text-muted-foreground hover:bg-accent/50'
+                    : 'border-border bg-background text-muted-foreground hover:bg-expense-light/30 hover:border-expense/30 hover:text-expense'
                 }`}
               >
                 <TrendingDown className="h-4 w-4" />
@@ -123,7 +123,7 @@ export function TransactionForm() {
                 className={`flex items-center justify-center gap-2 rounded-xl border-2 p-4 transition-all ${
                   type === 'income'
                     ? 'border-income bg-income-light/50 text-income shadow-sm'
-                    : 'border-border bg-background text-muted-foreground hover:bg-accent/50'
+                    : 'border-border bg-background text-muted-foreground hover:bg-income-light/30 hover:border-income/30 hover:text-income'
                 }`}
               >
                 <TrendingUp className="h-4 w-4" />

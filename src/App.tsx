@@ -22,10 +22,11 @@ function AppContent() {
               to={isAuthenticated ? '/' : '/about'} 
               className="flex items-center gap-2 transition-transform duration-200 hover:scale-105"
             >
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/80 shadow-sm">
-                <span className="text-sm font-bold text-primary-foreground">F</span>
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white shadow-sm overflow-hidden border border-border/20">
+                <img src="/financiary-logo-icon.png" alt="Logo" className="h-7 w-7 object-contain" />
               </div>
-              <h1 className="text-lg sm:text-xl font-semibold tracking-tight">Financiary</h1>
+              <img src="/financiary-nom-texte.png" alt="Financiary" className="h-6 sm:h-7 object-contain hidden xs:block" />
+              <h1 className="text-lg sm:text-xl font-bold tracking-tight xs:hidden">Financiary</h1>
             </Link>
             <Navbar />
           </div>
