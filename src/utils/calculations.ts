@@ -1,5 +1,5 @@
 import { Transaction } from '@/types/transaction';
-import { isWithinInterval, startOfMonth, endOfMonth, startOfWeek, endOfWeek, startOfYear, endOfYear, parseISO, subDays } from 'date-fns';
+import { isWithinInterval, startOfMonth, endOfMonth, startOfYear, endOfYear, parseISO, subDays } from 'date-fns';
 
 /**
  * Calcule le solde actuel (revenus - dépenses)

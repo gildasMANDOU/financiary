@@ -13,7 +13,7 @@ import { TransactionItem } from '@/components/TransactionItem';
  */
 export function TransactionList() {
   const navigate = useNavigate();
-  const { getSortedTransactions, isLoading, filteredTransactions } = useFinanceStore();
+  const { getSortedTransactions, isLoading } = useFinanceStore();
   const { confirm, ConfirmDialog } = useConfirmDialog();
   const { alert, Alert } = useAlert();
 

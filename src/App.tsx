@@ -68,7 +68,7 @@ function AppContent() {
       <footer className="border-t border-border/40 mt-16 py-6 animate-in fade-in-0 duration-500">
         <div className="container mx-auto px-4 text-center">
           <p className="text-xs text-muted-foreground">
-            © 2024 Financ
+            © 2024 Financiary
           </p>
         </div>
       </footer>
